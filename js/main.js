@@ -1,11 +1,15 @@
-window.onload = function(){
+    // Set the onload function to initialize the chess board
+    window.onload = function(){
+    // Get the width and height of the window
+
     var w = window.innerWidth || 360;
     var h = window.innerHeight || 500;
 
     var tsw = (w > h) ? h : w;
 
     var sw = (tsw - 16)/8;
-
+    
+    // Loop through and create 64 squares for the chess board
     var container = document.getElementById("container");
     for(var n = 0; n < 64; n++){
         var square = document.createElement("div");
@@ -19,21 +23,21 @@ window.onload = function(){
         container.appendChild(square);
     }
 
+    // Define the character codes for each chess piece
     var fonts = {
-        'k' : '&#9818;',
-        'q' : '&#9819;',
-        'r' : '&#9820',
-        'b' : '&#9821',
-        'n' : '&#9822',
-        'p' : '&#9823',
-        'l' : '&#9812;',
-        'w' : '&#9813;',
-        't' : '&#9814',
-        'v' : '&#9815',
-        'm' : '&#9816',
-        'o' : '&#9817',
-
-    }
+    'k' : '&#9818;', // King
+    'q' : '&#9819;', // Queen
+    'r' : '&#9820', // Rook
+    'b' : '&#9821', // Bishop
+    'n' : '&#9822', // Knight
+    'p' : '&#9823', // Pawn
+    'l' : '&#9812;', // White King
+    'w' : '&#9813;', // White Queen
+    't' : '&#9814', // White Rook
+    'v' : '&#9815', // White Bishop
+    'm' : '&#9816', // White Knight
+    'o' : '&#9817', // White Pawn
+}
 
     var values = ['r','n','b','q','k','b','n','r','p','p','p','p','p','p','p','p',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'o','o','o','o','o','o','o','o','t','m','v','w','l','v','m','t'];
     var ck = false;
@@ -50,6 +54,7 @@ window.onload = function(){
         sqs[n].addEventListener("click",check);
     }
 
+    //color squares function
     function updateSquarecolor(){
         for(var n = 0; n < 64; n++){
             if(Math.floor(n/8)%2 === 0){
@@ -78,21 +83,29 @@ window.onload = function(){
     var moveScopes = [];
 
 
+    // Check the available moves for black pieces
     function checkBlack(n,values){
+        // Get the target piece on the board
         var target = values[n];
+        // Store the possible moves for the target piece
         var scopes = [];
         var x = n;
 
+        // Check for white pawn piece
         if(target === "o"){
             x -= 8;
+            // Check for capturing move on the left
             if("prnbkq".indexOf(values[x-1]) >= 0 && x%8 != 0){
                 scopes.push(x-1);
             }
+             // Check for capturing move on the right
             if("prnbkq".indexOf(values[x+1]) >= 0 && x%8 != 7){
                 scopes.push(x+1);
             }
+            // Check for the forward move
             if(x >= 0 && values[x] === 0){
                 scopes.push(x);
+                // Check for the double step forward move
                 if(x >= 40){
                     if(x-8 >= 0 && values[x-8] === 0){
                         scopes.push(x-8);
@@ -100,7 +113,7 @@ window.onload = function(){
                 }
             }
         }
-
+        // Check for white rook piece
         else if(target === "t"){
             x = n;
             x -= 8;
@@ -163,7 +176,7 @@ window.onload = function(){
                 x--;
             }
         }
-
+        // White Knight
         else if(target === "m"){
             x = n;
             if(x%8 > 1 && x%8 < 6){
@@ -281,7 +294,7 @@ window.onload = function(){
                 }
             }
         }
-
+        // White Bishop
         else if(target === "v"){
             x = n;
             x -= 9;
@@ -345,6 +358,7 @@ window.onload = function(){
             }
         }
 
+        // White Queen
         else if(target === "w"){
             x = n;
             x -= 8;
@@ -468,6 +482,7 @@ window.onload = function(){
             }
         }
 
+        // White King
         else if(target === "l"){
             x = n;
             x += 8;
@@ -538,10 +553,12 @@ window.onload = function(){
         if(scopes.length) return scopes;
     }
 
+    // Check the available moves for white pieces
     function checkWhite(n,values){
         var target = values[n];
         var scopes = [];
         var x = n;
+        // Pawn
         if(target === "p"){
             x += 8;
             if("otmvlw".indexOf(values[x-1]) >= 0 && x%8 != 0){
@@ -559,7 +576,8 @@ window.onload = function(){
                 }
             }
         }
-
+        
+        //rook
         else if(target === "r"){
             x = n;
             x -= 8;
@@ -623,6 +641,7 @@ window.onload = function(){
             }
         }
 
+        //knight
         else if(target === "n"){
             x = n;
             if(x%8 > 1 && x%8 < 6){
@@ -741,6 +760,7 @@ window.onload = function(){
             }
         }
 
+        //bishop
         else if(target === "b"){
             x = n;
             x -= 9;
@@ -804,6 +824,7 @@ window.onload = function(){
             }
         }
 
+        //queen
         else if(target === "q"){
             x = n;
             x -= 8;
@@ -927,6 +948,7 @@ window.onload = function(){
             }
         }
 
+        //king
         else if(target === "k"){
             x = n;
             x += 8;
@@ -979,19 +1001,27 @@ window.onload = function(){
         if(scopes.length) return scopes;
     }
 
+
     var myTurn = true;
 
+    // Define the check function
     function check(){
+        // Check if it's currently the user's turn
         if(myTurn){
+            // Get the index of the selected square
             var n = Number(this.classList[1].slice(1));
             var target = values[n];
 
+            // Get all possible moves for the selected piece
             var scopes = checkBlack(n,values) || [];
 
             var x = n;
 
+             // Check if a move has already been made
             if(!moveable){
+                // If there are possible moves for the selected piece
                 if(scopes.length > 0){
+                    // Set moveable to true and store the target square and possible move scopes
                     moveable = true;
                     moveTarget = n;
                     moveScopes = scopes.join(",").split(",");
@@ -1001,22 +1031,27 @@ window.onload = function(){
                 }
             }
             else {
+                 // If a move has already been made
+                // Check if the selected square is a possible move
                 if(moveScopes.indexOf(String(n)) >= 0){
+                    // Store the current state of the board in a separate array
                     var checkArr = [];
                     var saveKing = false;
                     for(var z = 0; z < 64; z++){
                         checkArr[z] = values[z];
                     }
-
+                    // Make the move on the separate array
                     checkArr[n] = checkArr[moveTarget];
                     checkArr[moveTarget] = 0;
-
+                    
+                    // Check if the king is in check after the move
                     for(var y = 0; y < 64; y++){
                         if("prnbkq".indexOf(checkArr[y]) >= 0){
                             var checkScp = checkWhite(y,checkArr) || [];
                             for(var z = 0; z < checkScp.length; z++){
                                 if(checkArr[checkScp[z]] === 'l'){
                                     if(!saveKing){
+                                        // If the king is in check, display an alert
                                         alert('Save Your King');
                                         saveKing = true;
                                     }
@@ -1024,7 +1059,7 @@ window.onload = function(){
                             }
                         }
                     }
-
+                    // If the king is not in check, make the move on the actual board
                     if(!saveKing){
                         values[n] = values[moveTarget];
                         values[moveTarget] = 0;
@@ -1047,6 +1082,7 @@ window.onload = function(){
                         else if(moveTarget === 56){
                             cr1 = true;
                         }
+                        // Promote pawns if they reach the other end
                         if(values[n] === "o" && n < 8){
                             values[n] = "w";
                         }
@@ -1081,23 +1117,27 @@ window.onload = function(){
 
     var arr = [];
 
+    //AI
     function chooseTurn(){
         var approved = [];
         var actions = [];
         var effects = [];
 
-
+         // loop through all 64 squares on the chessboard
         for(var n = 0; n < 64; n++){
+            // check if square contains a white piece
             if("prnbqk".indexOf(values[n]) >= 0){
+                // get the possible moves for the white piece
                 var scopes = checkWhite(n,values) || [];
+                // loop through the possible moves
                 for(var x = 0; x < scopes.length; x++){
-                    var tmp = []//values.join(',').split(',');
+                    var tmp = []// store a copy of the chessboard values
                     for(var xx = 0; xx < 64; xx++){
                         tmp[xx] = values[xx]
                     }
                     var effect = 0;
                     var action = Math.random()*3;
-                    //Action value
+                      // calculate action value based on the piece at the target square
                     var actionValue = tmp[scopes[x]];
                     if(actionValue === "l"){
                         action = 100 + Math.random()*3;
@@ -1117,7 +1157,7 @@ window.onload = function(){
                     else if(actionValue === "o"){
                         action = 15 + Math.random()*3;
                     }
-                    //Effect value
+                    // calculate effect value based on the potential impact on the black pieces
                     tmp[scopes[x]] = tmp[n];
                     tmp[n] = 0;
                     for(var y = 0; y < 64; y++){
@@ -1161,7 +1201,7 @@ window.onload = function(){
 
 
 
-
+                    // store the action and effect values for the current move
                     actions.push(action);
                     effects.push(effect);
                     approved.push(n+"-"+scopes[x]);
@@ -1169,15 +1209,18 @@ window.onload = function(){
             }
         }
 
-        //alert(actions);
+        
 
         var bestEffect = Math.min.apply(null,effects);
-        //alert(bestEffect);
+        // Get the smallest value in the "effects" array
+
         if(bestEffect >= 100){
             alert("You Win");
             setTimeout(function(){
                 values = ['r','n','b','q','k','b','n','r','p','p','p','p','p','p','p','p',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'o','o','o','o','o','o','o','o','t','m','v','w','l','v','m','t'];
         },100);
+        // Display the message "You Win" if bestEffect is greater than or equal to 100
+        // Set a timeout of 100 milliseconds before resetting the values array
         }
 
         var tmpA = [];
@@ -1185,30 +1228,39 @@ window.onload = function(){
         var tmpC = [];
         var bestMove = "";
 
+        // Initialize three arrays (tmpA, tmpB, tmpC) and a string (bestMove)
+
         for(var n = 0; n < effects.length; n++){
             if(effects[n] === bestEffect){
                 tmpA.push(actions[n]);
                 tmpB.push(approved[n]);
                 tmpC.push(effects[n]);
+                // Push the corresponding elements of "actions", "approved", and "effects" arrays into the three temporary arrays
+
             }
         }
         bestMove = tmpB[tmpA.indexOf(Math.max.apply(null,tmpA))];
-    //    alert(effects)
-        //alert(bestMove);
+        // Get the best move by finding the maximum value in the "tmpA" array and using its index to get the corresponding value in the "tmpB" array
+
 
 
         if(bestMove){
             values[Number(bestMove.split("-")[1])] = values[Number(bestMove.split("-")[0])];
             values[Number(bestMove.split("-")[0])] = 0;
+             // Replace the value of the destination square with the value of the source square, and set the value of the source square to 0
             if(values[Number(bestMove.split("-")[1])] === "p" && Number(bestMove.split("-")[1]) >= 56){
                 values[Number(bestMove.split("-")[1])] = "q";
             }
+                // If the piece is a pawn and it reaches the 8th rank, change its value to a queen
+
 
             sqs[bestMove.split("-")[1]].style.background = '#aaf';
             sqs[bestMove.split("-")[0]].style.background = '#aaf';
+                // Change the background color of the source and destination squares
+
 
             for(var x = 0; x < 64; x++){
-                //sqs[x].style.background = "#afa"//classList.add("scope");
+                
                 sqs[x].innerHTML = fonts[values[x]];
                 if(values[x] === 0){
                     sqs[x].innerHTML = "";
@@ -1217,8 +1269,8 @@ window.onload = function(){
             myTurn = true;
         }
         else {
-            //alert('You Win');
+            
         }
     }
 }
-//chooseTurn();
+2
